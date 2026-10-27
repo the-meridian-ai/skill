@@ -1,0 +1,8 @@
+{
+  "mcpServers": {
+    "meridian": {
+      "type": "http",
+      "url": "https://mcp.the-meridian.ai/mcp"
+    }
+  }
+}

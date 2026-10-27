@@ -1,0 +1,15 @@
+{
+  "name": "meridian",
+  "description": "The Meridian plugin for Claude Code: build, bill and deploy Shopify apps on Meridian.",
+  "owner": {
+    "name": "The Meridian",
+    "url": "https://the-meridian.ai"
+  },
+  "plugins": [
+    {
+      "name": "meridian",
+      "source": "./plugins/meridian",
+      "description": "Connects the Meridian MCP server and teaches Claude to use the Meridian CLI, add the SDK to a Shopify app and deploy it on Meridian hosting."
+    }
+  ]
+}
