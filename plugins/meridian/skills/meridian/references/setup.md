@@ -15,7 +15,7 @@ meridian --version
 
 Server URL: `https://mcp.the-meridian.ai/mcp` (Streamable HTTP, OAuth 2.1 with PKCE). There is no API key: the client registers itself and the user approves it once in the browser.
 
-`meridian skills install` writes the project config for every agent it finds (pass `--no-mcp` to skip). To do it by hand:
+`meridian skills install` writes the project config for every agent it finds (add `--no-mcp` to skip it). To do it by hand:
 
 | Client | Config | Then |
 | --- | --- | --- |

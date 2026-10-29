@@ -48,6 +48,11 @@ Then approve the Meridian MCP connection in your browser the first time your age
 
 [AI agents](https://help.the-meridian.ai/ai-agents) in the Meridian docs.
 
+## Privacy and terms
+
+- [Privacy policy](https://app.the-meridian.ai/privacy)
+- [Terms of service](https://app.the-meridian.ai/terms)
+
 ## Contributing
 
 This plugin is generated from Meridian's main repository on every release. Pull requests to the-meridian-ai/skill are not merged. Report problems to support@the-meridian.ai.

@@ -1,7 +1,7 @@
 {
   "name": "meridian",
-  "displayName": "Meridian",
-  "version": "1.0.0",
+  "displayName": "Meridian for Shopify apps",
+  "version": "1.1.1",
   "description": "Build, bill and deploy Shopify apps on Meridian: the Meridian MCP server plus a skill for the CLI, the SDK and hosting.",
   "author": {
     "name": "The Meridian",
@@ -9,6 +9,7 @@
     "email": "support@the-meridian.ai"
   },
   "homepage": "https://help.the-meridian.ai/ai-agents",
+  "privacyPolicyUrl": "https://app.the-meridian.ai/privacy",
   "repository": "https://github.com/the-meridian-ai/skill",
   "license": "MIT",
   "keywords": [

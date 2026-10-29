@@ -41,7 +41,7 @@ On Meridian hosting these are injected at every deploy (check with `managed_vari
    This registers the webhooks, reports the install (automations fire), syncs Shopify subscriptions and trials, and attributes a referral.
 4. `app/routes/app.tsx` loader: `const shopToken = await meridian.mintShopToken({ shop: session.shop })`, returned to the component. `null` means "render without Meridian", not an error.
 5. Same file, inside `<AppProvider embedded>`: `shopToken ? <MeridianProvider shopToken={shopToken}><Outlet /></MeridianProvider> : <Outlet />`.
-6. Pricing route `app/routes/app.pricing.tsx`: build `returnUrl` in the loader as `` `https://${session.shop}/admin/apps/${process.env.SHOPIFY_API_KEY}/app/pricing` `` and render `<s-page><s-section><MeridianPricingPage returnUrl={returnUrl} /></s-section></s-page>`.
+6. Pricing route `app/routes/app.pricing.tsx`: build `returnUrl` in the loader as `https://<shop>/admin/apps/<client id>/app/pricing`, where `<shop>` is `session.shop` and `<client id>` is the app's Shopify client ID (public, already in `shopify.app.toml`), and render `<s-page><s-section><MeridianPricingPage returnUrl={returnUrl} /></s-section></s-page>`.
 7. Account route: `<MeridianAccountPage onChangePlan={() => navigate("/app/pricing")} />`.
 
 ## Gate and track

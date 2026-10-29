@@ -1,7 +1,7 @@
 {
   "$schema": "https://agent-plugins.org/schemas/1.0.0/plugin.schema.json",
   "name": "meridian",
-  "version": "1.0.0",
+  "version": "1.1.1",
   "description": "Build, bill and deploy Shopify apps on Meridian: the Meridian MCP server plus a skill for the CLI, the SDK and hosting.",
   "author": {
     "name": "The Meridian",
@@ -11,16 +11,26 @@
   "homepage": "https://help.the-meridian.ai/ai-agents",
   "repository": "https://github.com/the-meridian-ai/skill",
   "license": "MIT",
-  "keywords": ["shopify", "shopify-app", "billing", "hosting", "mcp", "meridian"],
+  "keywords": [
+    "shopify",
+    "shopify-app",
+    "billing",
+    "hosting",
+    "mcp",
+    "meridian"
+  ],
   "extensions": {
     "com.openai": {
       "interface": {
-        "displayName": "Meridian",
+        "displayName": "Meridian for Shopify apps",
         "shortDescription": "Build, bill and deploy Shopify apps on Meridian",
         "longDescription": "Meridian is a platform for Shopify app developers. This plugin connects the Meridian MCP server, so the agent reads your app's real plans, feature keys, deployments, logs and webhook routes, and adds a skill that teaches it to use the Meridian CLI, wire @the-meridian/sdk into a Shopify app (pricing page, feature gating, usage tracking) and deploy on Meridian hosting. Sign-in, API keys and secrets stay with you, and the agent asks before a production deploy, a rollback or a database reset.",
         "developerName": "Meridian",
         "category": "Developer Tools",
-        "capabilities": ["Read", "Write"],
+        "capabilities": [
+          "Read",
+          "Write"
+        ],
         "websiteURL": "https://the-meridian.ai",
         "privacyPolicyURL": "https://app.the-meridian.ai/privacy",
         "termsOfServiceURL": "https://app.the-meridian.ai/terms",
