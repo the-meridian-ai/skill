@@ -30,11 +30,12 @@ Variables, secrets, the release command and the health check path reach the app 
 ## Deploy and follow it
 
 1. `apps_list`, then `environments_list` for the `environment_id`.
-2. `managed_variables_list` and `secrets_list` to check every variable the code reads exists (names only, never values).
-3. `github_refs_list` for a pushed `git_sha`. A commit that is not pushed fails late in the build.
-4. Confirm with the user, then `deployment_create` with the environment and the sha (or the user pushes to the auto-deploy branch). Production needs the **hosting.promote** permission.
-5. Poll `deployment_get`. Status runs Queued, Building, Deploying (the release command, then the new revision), Verifying (the health check), then Succeeded, Failed or Cancelled. One deployment is active per environment.
-6. After it succeeds, `logs_tail` for runtime errors (`min_severity: "WARNING"`, `contains`, `since`).
+2. `app_readiness_get` (or `meridian doctor` in a terminal) for the environment. A `fail` check makes the deploy fail before its build: fix it first or list it for the user with the `fix` location. A `warn` check deploys, but tell the user.
+3. `managed_variables_list` and `secrets_list` to check every variable the code reads exists (names only, never values).
+4. `github_refs_list` for a pushed `git_sha`. A commit that is not pushed fails late in the build.
+5. Confirm with the user, then `deployment_create` with the environment and the sha (or the user pushes to the auto-deploy branch). Production needs the **hosting.promote** permission.
+6. Poll `deployment_get`. Status runs Queued, Building, Deploying (the release command, then the new revision), Verifying (the health check), then Succeeded, Failed or Cancelled. One deployment is active per environment.
+7. After it succeeds, `logs_tail` for runtime errors (`min_severity: "WARNING"`, `contains`, `since`).
 
 ## When a deploy fails
 
@@ -42,6 +43,7 @@ Run the MCP prompt `debug_failed_deploy` with the deployment: it returns the rea
 
 | Failed at | Usual cause |
 | --- | --- |
+| Queued, failed within seconds as an invalid configuration | A readiness check failed: the Shopify client ID or secret is missing, the database is still being created, or the Prisma schema stores sessions in a file. `app_readiness_get` names it and where to fix it |
 | Building | The Dockerfile build fails (a missing dependency, a build script that needs a variable a build cannot see) |
 | Running release command | The migration fails. Read its output in the deploy log |
 | Verifying | The health check path redirects, needs auth, answers non-200, or the container port is wrong |
