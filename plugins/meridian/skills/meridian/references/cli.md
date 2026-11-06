@@ -31,6 +31,7 @@ Every command accepts the global flags `--json` (one JSON result on stdout, huma
 | `meridian db shell --repl -e "<sql>" --json` | Runs one statement and prints the rows as JSON | `--repl` matters: without it an installed `mysql` client prints plain text |
 | `meridian db reset --yes --migrate` | Drops every table, then reapplies the migrations (`--seed` to seed too) | Destructive. Confirm with the user first |
 | `meridian db credential list --env production` | Lists external access credentials of a hosted environment's database | Creating and rotating them is dashboard-only |
+| `meridian deploy --watch` | Deploys the checked-out commit to production (`--env staging`, `--sha <commit>`) and follows it to the end, printing each phase and the new log lines | The commit must be pushed. Exits 1 when the deploy fails, after printing the reason and the last log lines. Without `--watch` it only starts the deploy. `--deployment <id>` follows one already started. Confirm a production deploy with the user first |
 | `meridian whoami --json` | The signed-in user, their organizations and the linked project | |
 | `meridian link --org <slug> --app <slug>` | Links the project | See setup |
 | `meridian skills install` | Installs or updates this skill and the MCP config in the project | `--agent all`, `--no-mcp` |

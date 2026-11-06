@@ -1,6 +1,6 @@
 # Deploying on Meridian hosting
 
-Meridian builds the app from a commit of its connected GitHub repository, runs it on Cloud Run, and puts it behind its own edge (`*.the-meridian.app` or a custom domain). Deploys come only from GitHub: a push to the auto-deploy branch, a manual deploy of a branch and commit (dashboard or MCP `deployment_create`), a promote, or a rollback. There is no CLI deploy command.
+Meridian builds the app from a commit of its connected GitHub repository, runs it on Cloud Run, and puts it behind its own edge (`*.the-meridian.app` or a custom domain). Deploys come only from GitHub: a push to the auto-deploy branch, a manual deploy of a pushed commit (dashboard, MCP `deployment_create` or `meridian deploy`), a promote, or a rollback.
 
 Each app has a Production environment. Development is optional on every plan, Staging is Enterprise only. Each environment has its own service, database, variables and add-ons.
 
@@ -34,12 +34,12 @@ Variables, secrets, the release command and the health check path reach the app 
 3. `managed_variables_list` and `secrets_list` to check every variable the code reads exists (names only, never values).
 4. `github_refs_list` for a pushed `git_sha`. A commit that is not pushed fails late in the build.
 5. Confirm with the user, then `deployment_create` with the environment and the sha (or the user pushes to the auto-deploy branch). Production needs the **hosting.promote** permission.
-6. Poll `deployment_get`. Status runs Queued, Building, Deploying (the release command, then the new revision), Verifying (the health check), then Succeeded, Failed or Cancelled. One deployment is active per environment.
+6. Follow it with `deployment_get` and `wait_until: "finished"`: each call waits up to 50 seconds, so never sleep between calls. Call again while `finished` is false. `steps` gives each phase (queued, build, deploy, verify) with its status and duration, and `events` come newest first without build boilerplate. Status runs Queued, Building, Deploying (the release command, then the new revision), Verifying (the health check), then Succeeded, Failed or Cancelled. One deployment is active per environment. In a terminal, `meridian deploy --watch` deploys the checked-out commit and follows it the same way (`meridian deploy --watch --deployment <id>` follows one already started).
 7. After it succeeds, `logs_tail` for runtime errors (`min_severity: "WARNING"`, `contains`, `since`).
 
 ## When a deploy fails
 
-Run the MCP prompt `debug_failed_deploy` with the deployment: it returns the real error, the recent build events and the calls to make next. Common causes:
+`error_message` quotes the failing step's first error block (or the container's last output for a crash at boot). While `error_message_pending` is true the output or the build log is still being read: call `deployment_get` with `wait_until: "finished"` again. Run the MCP prompt `debug_failed_deploy` with the deployment: it returns the real error, the recent build events and the calls to make next. Common causes:
 
 | Failed at | Usual cause |
 | --- | --- |
