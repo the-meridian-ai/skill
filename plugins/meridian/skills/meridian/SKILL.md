@@ -35,7 +35,7 @@ A new app usually goes through all four references in that order: setup, SDK, lo
 
 - Signing in: `meridian login` runs a device-code flow the user approves in their browser. Ask them to run it in their own terminal, then check with `meridian whoami --json`.
 - Approving the MCP connection (the OAuth consent screen in their browser).
-- Creating or rotating `MERIDIAN_API_KEY` (Settings, SDK in the dashboard) and putting it in `.env` or the hosting secrets. Never ask them to paste a key, a password or a secret into the chat.
+- Creating or rotating the production `MERIDIAN_API_KEY` (Settings, SDK in the dashboard) and putting it in the hosting secrets. For local development `meridian dev` provides `MERIDIAN_APP_ID`, a dev SDK key and `MERIDIAN_API_URL` itself, so do not ask the user to paste a key into `.env`. Never ask them to paste a key, a password or a secret into the chat.
 - Entering hosting secrets and variables, installing the Meridian GitHub app, adding a custom domain, choosing a plan.
 
 **Confirm in chat before you do these**, naming exactly what will happen:

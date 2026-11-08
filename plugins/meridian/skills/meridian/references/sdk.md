@@ -11,12 +11,12 @@ Before writing code, get the real keys: the MCP prompt `integrate_sdk` returns a
 
 | Variable | Where it comes from |
 | --- | --- |
-| `MERIDIAN_APP_ID` | Dashboard, the app's Settings, SDK page. Not a secret. |
-| `MERIDIAN_API_KEY` | Same page, **Create API key** (shown once, starts `mrd_sk_`). Server only. The user creates it and puts it in `.env` themselves. |
+| `MERIDIAN_APP_ID` | Dashboard, the app's Settings, SDK page. Not a secret. Under `meridian dev`, injected for you. |
+| `MERIDIAN_API_KEY` | Same page, **Create API key** (shown once, starts `mrd_sk_`). Server only. For local development `meridian dev` injects a dev key limited to dev stores, so nothing goes in `.env`. For production the user creates one and sets it as a hosting secret themselves. A value already in the shell or `.env` wins, and then `meridian dev` injects none of the three. |
 | `MERIDIAN_WEBHOOK_SECRET` | Only to verify forwarded webhooks. Pub/Sub, Webhooks page. |
-| `MERIDIAN_API_URL` | Leave unset. |
+| `MERIDIAN_API_URL` | Leave unset. `meridian dev` sets it only when it injects the key (staging for a CLI logged in on staging). |
 
-On Meridian hosting these are injected at every deploy (check with `managed_variables_list`), so they only need to be in the local `.env`.
+On Meridian hosting these are injected at every deploy (check with `managed_variables_list`). Locally, run the dev server through `meridian dev`, which injects them (see the CLI reference), instead of copying them into `.env`.
 
 ## Wire it in
 

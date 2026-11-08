@@ -25,7 +25,7 @@ Every command accepts the global flags `--json` (one JSON result on stdout, huma
 
 | Command | What it does | Notes for agents |
 | --- | --- | --- |
-| `meridian dev` | Provisions the database (up to 5 minutes the first time), opens the gateway, writes `DATABASE_URL` and `SHADOW_DATABASE_URL` into `.env`, then runs `npm run dev` | Long-running: start it in the background. Run another command with `meridian dev -- shopify app dev`. `--no-env` prints the URL instead of editing `.env` |
+| `meridian dev` | Provisions the database (up to 5 minutes the first time), opens the gateway, writes `DATABASE_URL` and `SHADOW_DATABASE_URL` into `.env`, injects `MERIDIAN_APP_ID`, a dev SDK key and `MERIDIAN_API_URL` into the dev server's environment (never into `.env`), then runs `npm run dev` | Long-running: start it in the background. Run another command with `meridian dev -- shopify app dev`. `--no-env` prints the URL instead of editing `.env`. The SDK works with no manual step. Do not ask the user for a key; a `MERIDIAN_APP_ID` or `MERIDIAN_API_KEY` already in their shell or `.env` wins and nothing is injected |
 | `meridian migrate -- --name <name>` | Snapshots the database to `.meridian/snapshots/`, runs `prisma migrate dev`, restores the snapshot if it fails | Always pass `--name`, or Prisma prompts. Arguments after `--` go to Prisma |
 | `meridian db seed` | Runs `npx prisma db seed` with the gateway open | |
 | `meridian db shell --repl -e "<sql>" --json` | Runs one statement and prints the rows as JSON | `--repl` matters: without it an installed `mysql` client prints plain text |
