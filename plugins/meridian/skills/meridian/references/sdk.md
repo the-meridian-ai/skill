@@ -29,7 +29,7 @@ On Meridian hosting these are injected at every deploy (check with `managed_vari
    export const meridian = createMeridianApp()
    ```
 
-   It never throws. Unconfigured, `meridian.configured` is `false` and every method returns its empty result.
+   It never throws. Unconfigured, `meridian.configured` is `false`. In SDK 3.4.0 and later, construction warns once per process, including in production, naming the missing credentials. Methods return their empty result, or `status: "unconfigured"` for `trackDetailed` and `trackManyDetailed`.
 3. `app/shopify.server.ts`, in `shopifyApp({ hooks })`:
 
    ```ts
@@ -57,6 +57,7 @@ Server side: `meridian.track({ shop, eventKey, quantity, idempotencyKey })`, or 
 
 ## Pitfalls
 
+- **Confirm tracking.** Without credentials, `track` returns `null` and logs nothing per call. Check `meridian.configured` or use `trackDetailed` (SDK 3.4.0 and later), and never report an event as counted without `status: "recorded"`.
 - **Billing needs Meridian hosting.** `subscribe`, `cancelSubscription` and `updateUsageCap` work only when the app runs on Meridian with a managed database, or locally under `meridian dev`. Otherwise they fail with `403 PLAN_BUILDER_UNAVAILABLE` and `err.details.plan_builder_billing_status` names the cause. Two things fail quietly instead: usage overage is never charged and prices fall back to USD. See `sdk-hosting.mdx`.
 - **SQLite breaks billing** with `session_table_missing`. Prisma must use MySQL (`references/cli.md`).
 - **`returnUrl`** must be the `https` shop-admin URL of the pricing route itself. One built from `request.url`, `window.location` or the app's own origin is rejected (`INVALID_RETURN_URL`).
