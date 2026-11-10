@@ -15,19 +15,20 @@ Meridian is a platform for Shopify app developers: plans and billing through Sho
    - `meridian --version` (the CLI is installed)
    - the MCP server is connected (a `whoami` tool call answers)
    - `meridian whoami --json` (signed in), and `.meridian/project.json` exists (the project is linked)
-   - `@the-meridian/sdk` is in `package.json` and `app/meridian.server.ts` exists (the SDK is wired)
+   - `@the-meridian/sdk` is in `package.json` and `app/meridian.server.ts` (or `app/meridian/meridian.server.ts` in the Meridian template) exists (the SDK is wired)
 
 ## Pick the workflow
 
 | The user wants to | Read |
 | --- | --- |
+| Start a project made from the Meridian Shopify app template (`app/meridian/` exists) | [references/template.md](references/template.md) |
 | Install the CLI, connect MCP, sign in, link the project | [references/setup.md](references/setup.md) |
 | Add plans, pricing, gating or usage tracking (the SDK) | [references/sdk.md](references/sdk.md) |
 | Run the app locally on a Meridian database, migrate, seed | [references/cli.md](references/cli.md) |
 | Deploy, follow a deploy, fix a failed deploy, set variables | [references/hosting.md](references/hosting.md) |
 | Work on webhooks, Shopify API alerts, CRM, emails, automations | "Operate and grow" below |
 
-A new app usually goes through all four references in that order: setup, SDK, local development, deploy.
+A new app usually goes through all four references in that order: setup, SDK, local development, deploy. A project made from the Meridian template starts with `references/template.md` instead, which asks the developer a few questions first and skips what the template already did.
 
 ## Rules that always apply
 
