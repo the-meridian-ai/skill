@@ -11,7 +11,7 @@ Check each item in the repository before the first deploy, and fix what fails:
 1. **`Dockerfile` at the repository root.** A deploy is refused without one ("Dockerfile not found at root of repository"). The Shopify template's Dockerfile works. The build runs with `NODE_ENV=production`.
 2. **Prisma on MySQL** with `url = env("DATABASE_URL")` (`references/cli.md`). Meridian injects `DATABASE_URL` for the environment's managed database, plus the `DB_*` variables. A `DATABASE_URL` the user sets wins.
 3. **Migrations in the release command**, not at startup. The environment's release command should be `npx prisma migrate deploy`. It runs once per deploy in the new image, before traffic moves, with a 15 minute limit, and a non-zero exit fails the deploy while the old revision keeps serving. Then remove `prisma migrate deploy` from the `docker-start` script and run `prisma generate` at build time, which cuts the cold start from over ten seconds to a few.
-4. **A health check route answering 200** on the environment's health check path (usually `/health`), with no redirect and no authentication. A redirect counts as a failure. A minimal React Router route: `app/routes/health.tsx` exporting `export const loader = () => new Response("ok")`.
+4. **A health check route answering 200** on the environment's health check path (usually `/health`), with no redirect and no authentication. Meridian verifies a deploy by asking Cloud Run whether the revision is ready, and calls this path only when Cloud Run cannot confirm it (pull request previews use the production environment's path), so the route is a fallback rather than a requirement. A redirect counts as a failure. A minimal React Router route: `app/routes/health.tsx` exporting `export const loader = () => new Response("ok")`.
 5. **The container port** set on the environment matches the port the server listens on (the template serves on `3000`, or reads `PORT`).
 6. **The host header.** The edge passes the public hostname in `X-Forwarded-Host`. Code that reads the request host reads that header. React Router form actions need no `allowedActionOrigins` for Meridian hostnames.
 
@@ -46,7 +46,7 @@ Variables, secrets, the release command and the health check path reach the app 
 | Queued, failed within seconds as an invalid configuration | A readiness check failed: the Shopify client ID or secret is missing, the database is still being created, or the Prisma schema stores sessions in a file. `app_readiness_get` names it and where to fix it |
 | Building | The Dockerfile build fails (a missing dependency, a build script that needs a variable a build cannot see) |
 | Running release command | The migration fails. Read its output in the deploy log |
-| Verifying | The health check path redirects, needs auth, answers non-200, or the container port is wrong |
+| Verifying | The container stops at boot or does not listen on the container port, so Cloud Run never reports it ready, and the health check path redirects, needs auth or answers non-200 |
 | Runtime errors after success | A missing variable (`managed_variables_list`, `secrets_list`) or a schema mismatch (`database_schema_get`) |
 
 `deployment_rollback` sends traffic back to an earlier succeeded deployment with no rebuild. Ask the user before you call it.
