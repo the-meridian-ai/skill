@@ -22,7 +22,7 @@ You cannot do these. List the missing ones for the user:
 - Connect the repository: Settings, Integrations, GitHub card. It installs the Meridian GitHub app.
 - Add the database: Hosting, Database (MySQL, up to five minutes to provision).
 - Set the environment's release command, health check path and container port.
-- Add their own variables and secrets on the Environment page (write-only secrets, scoped to all environments or one). Meridian injects `SHOPIFY_API_KEY`, `SHOPIFY_API_SECRET`, `MERIDIAN_APP_ID`, `MERIDIAN_API_URL`, `MERIDIAN_API_KEY`, `MERIDIAN_WEBHOOK_SECRET`, `DB_*` and the add-on variables itself.
+- Type the value of a secret: on the Environment page (write-only secrets, scoped to all environments or one), or for development and staging with `meridian env set KEY --env development` in their own terminal, which asks for it at a masked prompt. Plain variables on development and staging you set yourself with `meridian env set`, and anything on production or for all environments goes through MCP `secrets_set` / `secrets_unset` once the user agrees ("Variables and secrets" in `SKILL.md`). Meridian injects `SHOPIFY_API_KEY`, `SHOPIFY_API_SECRET`, `MERIDIAN_APP_ID`, `MERIDIAN_API_URL`, `MERIDIAN_API_KEY`, `MERIDIAN_WEBHOOK_SECRET`, `DB_*` and the add-on variables itself.
 - Choose the auto-deploy branch and target.
 
 Variables, secrets, the release command and the health check path reach the app with the next deploy. `environments_list` shows `config_pending_deploy: true` until then.
@@ -31,7 +31,7 @@ Variables, secrets, the release command and the health check path reach the app 
 
 1. `apps_list`, then `environments_list` for the `environment_id`.
 2. `app_readiness_get` (or `meridian doctor` in a terminal) for the environment. A `fail` check makes the deploy fail before its build: fix it first or list it for the user with the `fix` location. A `warn` check deploys, but tell the user.
-3. `managed_variables_list` and `secrets_list` to check every variable the code reads exists (names only, never values).
+3. `managed_variables_list` and `secrets_list` (or `meridian env list --env production` in a terminal) to check every variable the code reads exists (names only, never values).
 4. `github_refs_list` for a pushed `git_sha`. A commit that is not pushed fails late in the build.
 5. Confirm with the user, then `deployment_create` with the environment and the sha (or the user pushes to the auto-deploy branch). Production needs the **hosting.promote** permission.
 6. Follow it with `deployment_get` and `wait_until: "finished"`: each call waits up to 50 seconds, so never sleep between calls. Call again while `finished` is false. `steps` gives each phase (queued, build, deploy, verify) with its status and duration, and `events` come newest first without build boilerplate. Status runs Queued, Building, Deploying (the release command, then the new revision), Verifying (the health check), then Succeeded, Failed or Cancelled. One deployment is active per environment. In a terminal, `meridian deploy --watch` deploys the checked-out commit and follows it the same way (`meridian deploy --watch --deployment <id>` follows one already started).

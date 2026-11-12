@@ -37,13 +37,23 @@ A new app usually goes through all four references in that order: setup, SDK, lo
 - Signing in: `meridian login` runs a device-code flow the user approves in their browser. Ask them to run it in their own terminal, then check with `meridian whoami --json`.
 - Approving the MCP connection (the OAuth consent screen in their browser).
 - Creating or rotating the production `MERIDIAN_API_KEY` (Settings, SDK in the dashboard) and putting it in the hosting secrets. For local development `meridian dev` provides `MERIDIAN_APP_ID`, a dev SDK key and `MERIDIAN_API_URL` itself, so do not ask the user to paste a key into `.env`. Never ask them to paste a key, a password or a secret into the chat.
-- Entering hosting secrets and variables, installing the Meridian GitHub app, adding a custom domain, choosing a plan.
+- Typing a secret's value (see "Variables and secrets" below), installing the Meridian GitHub app, adding a custom domain, choosing a plan.
 
 **Confirm in chat before you do these**, naming exactly what will happen:
 
 - Deploying to production, promoting to production, or `deployment_rollback`.
 - `meridian db reset`, `dev_database_reset`, or anything else that drops data.
 - `automation_update` on an automation that is already active, or `custom_field_values_set` on a real store.
+- Setting a secret, changing any variable on production or for all environments, or deleting any variable. Name the key, the scope and the environment.
+
+**Variables and secrets** (the app's hosting environment variables):
+
+- A plain variable on development or staging: set it yourself without asking, then tell the user what you set. Pipe the value in, for example `printf '%s' "$VALUE" | meridian env set API_URL --env development --plain`. That is fine only because a plain value is not secret.
+- A secret on development or staging: once the user agrees, either they type it in their own terminal with `meridian env set KEY --env development` (a masked prompt) or in the dashboard, or you generate a random one and pipe it without ever printing it: `openssl rand -hex 32 | meridian env set KEY --env development --secret`.
+- Production, or all environments at once: the CLI refuses both. Once the user agrees, use MCP `secrets_set` / `secrets_unset` for a plain variable, and ask the user to type a secret in the dashboard.
+- Deleting: `meridian env unset KEY --env development` (or `secrets_unset`), only after the user agrees.
+- Read names with `meridian env list --env development` or `secrets_list`. Neither shows a value.
+- Never ask for a value in the chat, never put a secret on the command line or in a file you commit, and never print one.
 
 **Never:**
 
@@ -62,9 +72,9 @@ Every tool below takes `app_id` (from `apps_list`). Read the tool's own descript
 | What a store is entitled to right now | `entitlements_explain` |
 | CRM fields and segments | `custom_fields_list`, `crm_segments_list`, `crm_segment_get`, `custom_field_values_set` |
 | Emails | `emails_list`, `email_get`, `emails_variables_list`, `email_create` and `email_update` (inactive drafts and metadata only) |
-| Automations | `automations_catalog_get` first, then `automation_create`, `automation_update` (inactive only), `automation_test_run` (dry run, sends nothing) |
+| Automations | `automations_catalog_get` first, then `automation_create` or `automation_create_from_template` (a catalog template with its starter emails, all inactive), `automation_update` (inactive only), `automation_test_run` (dry run, sends nothing) |
 
-Email bodies, activating an email or automation, live sends, prices and discounts stay in the dashboard. Say so instead of looking for a workaround.
+An agent never writes an email body: the only body is Meridian's own starter copy from `automation_create_from_template`. Activating an email or automation, live sends, prices and discounts stay in the dashboard. Say so instead of looking for a workaround.
 
 ## When something is refused
 

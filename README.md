@@ -3,11 +3,11 @@
 The Meridian skill for Claude Code, Codex and Cursor. It teaches your coding agent to build, bill and deploy a Shopify app on [Meridian](https://the-meridian.ai):
 
 - connect the Meridian MCP server, so the agent reads your real plans, feature keys, deploys and logs
-- install and drive the Meridian CLI (`meridian login`, `link`, `dev`, `migrate`, `db`)
+- install and drive the Meridian CLI (`meridian login`, `link`, `dev`, `migrate`, `db`, `env`)
 - add `@the-meridian/sdk` to your app: pricing page, feature gating, usage tracking
 - get the app ready for Meridian hosting, deploy it, and debug a failed deploy
 
-The agent leaves sign-in, API keys and secrets to you, and asks before a production deploy, a rollback or a database reset.
+The agent leaves sign-in, API keys and secret values to you. It sets plain variables on development and staging itself and tells you, and asks before any other variable change, a production deploy, a rollback or a database reset.
 
 ## Install
 
