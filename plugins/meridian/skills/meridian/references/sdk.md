@@ -59,7 +59,7 @@ Server side: `meridian.track({ shop, eventKey, quantity, idempotencyKey })`, or 
 
 - **Confirm tracking.** Without credentials, `track` returns `null` and logs nothing per call. Check `meridian.configured` or use `trackDetailed` (SDK 3.4.0 and later), and never report an event as counted without `status: "recorded"`.
 - **Billing needs Meridian hosting.** `subscribe`, `cancelSubscription` and `updateUsageCap` work only when the app runs on Meridian with a managed database, or locally under `meridian dev`. Otherwise they fail with `403 PLAN_BUILDER_UNAVAILABLE` and `err.details.plan_builder_billing_status` names the cause. Two things fail quietly instead: usage overage is never charged and prices fall back to USD. See `sdk-hosting.mdx`.
-- **SQLite breaks billing** with `session_table_missing`. Prisma must use MySQL (`references/cli.md`).
+- **SQLite breaks billing** with `session_table_missing`. Prisma must use the app's database engine, MySQL or PostgreSQL (`references/hosting.md`).
 - **`returnUrl`** must be the `https` shop-admin URL of the pricing route itself. One built from `request.url`, `window.location` or the app's own origin is rejected (`INVALID_RETURN_URL`).
 - **Gates fail open.** While `loading` is true, or after an error, everything reads as enabled. Check `loading` first, or paying merchants see an upgrade prompt flash. An unknown key reads `false` with no error.
 - **Keys, not ids.** `track` and `updateUsageCap` take the event key. A UUID is refused with 422.

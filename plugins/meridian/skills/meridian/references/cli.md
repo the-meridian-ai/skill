@@ -1,6 +1,8 @@
 # Local development with the CLI
 
-`meridian dev` gives each developer a private MySQL 8.4 database on Meridian, reached through the Meridian database gateway on `127.0.0.1`. No Docker, no local MySQL, no cloud credentials. Billing works locally because Meridian can read the sessions this database holds (installs made locally are Shopify test charges).
+`meridian dev` gives each developer a private database on Meridian (MySQL 8.4 or PostgreSQL 18, the engine of the app), reached through the Meridian database gateway on `127.0.0.1`. No Docker, no local database server, no cloud credentials. Billing works locally because Meridian can read the sessions this database holds (installs made locally are Shopify test charges).
+
+On an app whose engine is PostgreSQL, keep `provider = "postgresql"`: `meridian dev` writes `postgresql://` URLs for `DATABASE_URL` and `SHADOW_DATABASE_URL`. Do not switch the provider to `mysql`, because the deploy would then fail its engine check.
 
 The project must be linked first (`references/setup.md`).
 
