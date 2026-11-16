@@ -35,16 +35,23 @@ A new app usually goes through all four references in that order: setup, SDK, lo
 **The human does these, never you.** Ask the user, explain why, and wait:
 
 - Signing in: `meridian login` runs a device-code flow the user approves in their browser. Ask them to run it in their own terminal, then check with `meridian whoami --json`.
+- Approving production access: the user approves it in their browser, after confirming it's them. You may start the request and hand it over (see "Production changes from the CLI" below), but never approve anything yourself.
 - Approving the MCP connection (the OAuth consent screen in their browser).
 - Creating or rotating the production `MERIDIAN_API_KEY` (Settings, SDK in the dashboard) and putting it in the hosting secrets. For local development `meridian dev` provides `MERIDIAN_APP_ID`, a dev SDK key and `MERIDIAN_API_URL` itself, so do not ask the user to paste a key into `.env`. Never ask them to paste a key, a password or a secret into the chat.
 - Typing a secret's value (see "Variables and secrets" below), installing the Meridian GitHub app, adding a custom domain, choosing a plan.
 
 **Confirm in chat before you do these**, naming exactly what will happen:
 
-- Deploying to production, promoting to production, or `deployment_rollback`.
+- Deploying to production (`deployment_create`, or `meridian deploy` as in "Production changes from the CLI" below), promoting to production, or `deployment_rollback`.
 - `meridian db reset`, `dev_database_reset`, or anything else that drops data.
 - `automation_update` on an automation that is already active, or `custom_field_values_set` on a real store.
 - Setting a secret, changing any variable on production or for all environments, or deleting any variable. Name the key, the scope and the environment.
+
+**Production changes from the CLI** (any `meridian` command that writes to production). The CLI token is enough for development and staging. A production change also asks a confirmation question before it is sent, and may need production access, which the user approves in their browser for a limited time (`meridian deploy` to production needs it). Go in this order:
+
+1. Ask in the chat first, naming the action, the app and the environment, and wait for the user's agreement.
+2. When the command needs production access, check it with `meridian whoami --json`: `production_grant_expires_at` is when it ends, null without it. Without it, or when the CLI refuses with `Run: meridian login --production`, start `meridian login --production --json` in the background. It puts the link and the code on stderr and waits up to 15 minutes. Give the user the link and the code, ask them to approve it in their browser, and never approve anything yourself. Do not pass `--for`: keep the default of 1 hour unless the user asks for another duration. Once they approved, check `meridian whoami --json` again.
+3. Only then run the command with `--yes`. `--yes` answers the CLI's own question and never replaces production access. Never pass it for a production change the user has not agreed to in the chat.
 
 **Variables and secrets** (the app's hosting environment variables):
 

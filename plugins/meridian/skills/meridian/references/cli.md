@@ -23,7 +23,7 @@ After switching, delete the old SQLite migrations in `prisma/migrations` (they c
 
 ## Commands
 
-Every command accepts the global flags `--json` (one JSON result on stdout, human lines on stderr), `--yes` (approve confirmations), `--no-input` (never prompt, fail instead) and `--cwd <dir>`.
+Every command accepts the global flags `--json` (one JSON result on stdout, human lines on stderr), `--yes` (approve confirmations, and for a production change only after the user agreed in the chat), `--no-input` (never prompt, fail instead) and `--cwd <dir>`.
 
 | Command | What it does | Notes for agents |
 | --- | --- | --- |
@@ -36,8 +36,10 @@ Every command accepts the global flags `--json` (one JSON result on stdout, huma
 | `meridian env list --env development` | Lists the environment's variables and secrets, with the ones set for all environments: key, type, scope, whether the environment overrides it, last update | Never shows a value. Works on every environment, production included |
 | `meridian env set KEY --env development --plain` | Creates or replaces one variable in development or staging. The value comes from stdin when it is piped, from `--from-file <path>`, or from a masked prompt in a terminal. A new key is a secret unless `--plain`. An existing key keeps its type | Never pass the value as an argument. A plain variable you may set without asking (say what you set). A secret: ask first, then let the user type it in their own terminal or pipe a generated one (`SKILL.md`, "Variables and secrets"). Production and all environments are refused: use MCP `secrets_set` once the user agrees |
 | `meridian env unset KEY --env development` | Deletes the environment's own entry of a key | Ask the user first. Needs `--yes` when it cannot prompt. A key set for all environments is refused (MCP `secrets_unset` with the user's agreement) |
-| `meridian deploy --watch` | Deploys the checked-out commit to production (`--env staging`, `--sha <commit>`) and follows it to the end, printing each phase and the new log lines | The commit must be pushed. Exits 1 when the deploy fails, after printing the reason and the last log lines. Without `--watch` it only starts the deploy. `--deployment <id>` follows one already started. Confirm a production deploy with the user first |
-| `meridian whoami --json` | The signed-in user, their organizations and the linked project | |
+| `meridian deploy --watch` | Deploys the checked-out commit to production (`--env staging`, `--sha <commit>`) and follows it to the end, printing each phase and the new log lines | The commit must be pushed. Exits 1 when the deploy fails, after printing the reason and the last log lines. Without `--watch` it only starts the deploy. `--deployment <id>` follows one already started. To production it needs production access and asks `Deploy <sha> to production of "<app>"? (y/N)`: follow "Production changes from the CLI" in `SKILL.md` (agreement in the chat, production access, then `--yes`). Staging and development deploys need neither |
+| `meridian login --production --json` | Requests production access for this machine's token, 1 hour by default (`--for`, 15m to 12h). On a machine not signed in yet, one approval covers the login too. Prints the link and the code on stderr and waits up to 15 minutes for the user to approve it in the browser. Exits non-zero when the request is denied or expires | Run it in the background, give the user the link and the code, and never approve it yourself. Do not pass `--for` unless the user asks for another duration. When access is already active it asks for nothing |
+| `meridian logout --production` | Ends this machine's production access and keeps the login | Only when the user asks |
+| `meridian whoami --json` | The signed-in user, their organizations, `production_grant_expires_at` (when production access ends, null without it) and the linked project | |
 | `meridian link --org <slug> --app <slug>` | Links the project | See setup |
 | `meridian skills install` | Installs or updates this skill and the MCP config in the project | `--agent all`, `--no-mcp` |
 
@@ -51,10 +53,11 @@ Exit code 1 for an expected error, 130 on Ctrl-C, otherwise the child process's 
 | --- | --- |
 | You are not logged in / token has expired / no longer valid (401) | The user runs `meridian login` |
 | This project is not linked to a Meridian app | `meridian link --org <slug> --app <slug>` |
-| Cannot prompt for X in a non-interactive shell | Pass the flag the hint names, or `--yes` |
+| Cannot prompt for X in a non-interactive shell | When X is a production change (`Deploy <sha> to production of "<app>"?`), stop: ask the user in the chat, naming the action, the app and the environment, and pass `--yes` only after they agree. Otherwise pass the flag the hint names, or `--yes` |
 | `schema.prisma` sets `provider = "sqlite"`, or reads another variable than `DATABASE_URL` | Switch the datasource (above) |
 | `dev_database_limit_reached` | The organization's plan has no developer database left. Tell the user |
-| `cli_upgrade_required` | `npm install -g @the-meridian/cli@latest` |
+| `cli_upgrade_required` | `npm install -g @the-meridian/cli@latest`. Production deploys need CLI 1.7.0 or later |
+| Production changes from the CLI need production access (`CLI_PRODUCTION_GRANT_REQUIRED`, hint `Run: meridian login --production`) | The user approves it: start `meridian login --production --json` in the background and give them the link and the code (`SKILL.md`, "Production changes from the CLI"). Retry once `meridian whoami --json` shows `production_grant_expires_at` |
 | Production variables can't be changed from the CLI | Ask the user, then use MCP `secrets_set` / `secrets_unset` for a plain variable, or ask them to set a secret in the dashboard |
 | `meridian dev` is already running in this process tree | You are inside a `meridian dev` session. Run the command directly, without nesting another one |
 

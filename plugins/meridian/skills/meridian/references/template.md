@@ -20,7 +20,7 @@ The template still holds placeholders. Before changing code, ask the developer t
    - set the release command to `npx prisma migrate deploy` (the health check path stays `/health` and the container port stays empty, which means 3000).
 
    Meridian injects SCOPES from scopes in `shopify.app.toml` at the deployed commit, so do not add it. A plans warning (no active plan) is expected until the developer activates one, and so is the boot variables warning that SHOPIFY_APP_URL differs from the app URL in `shopify.app.toml`, until step 4 points that URL at the Meridian address.
-3. Deploy: confirm with the developer, then `deployment_create` with a pushed commit, or `meridian deploy --watch`. Follow it with `deployment_get` (`references/hosting.md`).
+3. Deploy: confirm with the developer, then `deployment_create` with a pushed commit, or `meridian deploy --watch`, which to production also needs production access the developer approves in the browser, and `--yes` once they agreed ("Production changes from the CLI" in `SKILL.md`). Follow it with `deployment_get` (`references/hosting.md`).
 4. Shopify side, after the deploy succeeds and the project is linked (question 2): set the app URL and redirect URLs in `shopify.app.toml` to the environment's address. Linking replaces the whole file with the Dev Dashboard's copy, so edit it after linking, never before (from `environments_list`), then the developer runs `shopify app deploy` from the same commit, with `APP_URL=<that address>` when an extension calls the backend.
 
 ## Keep the template's shape
