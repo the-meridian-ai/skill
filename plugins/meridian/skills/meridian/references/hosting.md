@@ -30,7 +30,7 @@ Variables, secrets, the release command and the health check path reach the app 
 ## Deploy and follow it
 
 1. `apps_list`, then `environments_list` for the `environment_id`.
-2. `app_readiness_get` (or `meridian doctor` in a terminal) for the environment. A `fail` check makes the deploy fail before its build: fix it first or list it for the user with the `fix` location. A `warn` check deploys, but tell the user.
+2. `app_readiness_get` (or `meridian doctor` in a terminal) for the environment. A `fail` check makes the deploy fail before its build, except `shopify_billing`, which only warns at deploy: fix it before merchants subscribe. Fix a `fail` first or list it for the user with the `fix` location. A `warn` check deploys, but tell the user.
 3. `managed_variables_list` and `secrets_list` (or `meridian env list --env production` in a terminal) to check every variable the code reads exists (names only, never values).
 4. `github_refs_list` for a pushed `git_sha`. A commit that is not pushed fails late in the build.
 5. Confirm with the user in the chat, naming the app and the environment, then `deployment_create` with the environment and the sha (or the user pushes to the auto-deploy branch). Production needs the **hosting.promote** permission. From a terminal, `meridian deploy` to production also needs production access, approved by the user in the browser, and `--yes` once they agreed ("Production changes from the CLI" in `SKILL.md`).
