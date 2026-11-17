@@ -21,7 +21,7 @@ You cannot do these. List the missing ones for the user:
 
 - Connect the repository: Settings, Integrations, GitHub card. It installs the Meridian GitHub app.
 - Add the database: Hosting, Database (MySQL or PostgreSQL, one engine per app, up to five minutes to provision). A plan that includes a database creates a MySQL one with the app; to use PostgreSQL, the user deletes it before storing data and adds a PostgreSQL one.
-- Type the value of a secret: on the Environment page (write-only secrets, scoped to all environments or one), or for development and staging with `meridian env set KEY --env development` in their own terminal, which asks for it at a masked prompt. Plain variables on development and staging you set yourself with `meridian env set`, and anything on production or for all environments goes through MCP `secrets_set` / `secrets_unset` once the user agrees ("Variables and secrets" in `SKILL.md`). Meridian injects `SHOPIFY_API_KEY`, `SHOPIFY_API_SECRET`, `MERIDIAN_APP_ID`, `MERIDIAN_API_URL`, `MERIDIAN_API_KEY`, `MERIDIAN_WEBHOOK_SECRET`, `DB_*` and the add-on variables itself.
+- Type the value of a secret: on the Environment page (write-only secrets, scoped to all environments or one), or with `meridian env set KEY --env production` (or another `--env`, or `--all-environments`) in their own terminal, which asks for it at a masked prompt. Plain variables on development and staging you set yourself with `meridian env set`. Anything on production or for all environments is a production change: `meridian env set` / `meridian env unset` with the rule of "Production changes from the CLI", or MCP `secrets_set` / `secrets_unset` when the CLI is not available, once the user agrees ("Variables and secrets" in `SKILL.md`). Meridian injects `SHOPIFY_API_KEY`, `SHOPIFY_API_SECRET`, `MERIDIAN_APP_ID`, `MERIDIAN_API_URL`, `MERIDIAN_API_KEY`, `MERIDIAN_WEBHOOK_SECRET`, `DB_*` and the add-on variables itself.
 - Add a custom domain: Hosting, Domains. `environments_list` returns its DNS records once it is added.
 - Choose the auto-deploy branch and target. You can read them: `environments_list` returns the branch and the environment a push really deploys to (a development target lands on production when the app has no development environment). Check it before you merge or push to that branch, and tell the user when a merge would deploy to production.
 
@@ -59,7 +59,7 @@ Variables, secrets, the Shopify credentials, the release command and the health 
 | Verifying | The container stops at boot or does not listen on the container port, so Cloud Run never reports it ready, and the health check path redirects, needs auth or answers non-200 |
 | Runtime errors after success | A missing variable (`managed_variables_list`, `secrets_list`) or a schema mismatch (`database_schema_get`) |
 
-`deployment_rollback` sends traffic back to an earlier succeeded deployment with no rebuild. Ask the user before you call it.
+`deployment_rollback`, or `meridian rollback` in a terminal, sends traffic back to an earlier succeeded deployment with no rebuild. `meridian rollback` goes back to the deployment before the live one unless `--to <deployment-id>` names another, and a second rollback in a row goes one step further back. Ask the user before either, naming the app and the environment, and the deployment when you name one. To production, `meridian rollback` also follows "Production changes from the CLI" in `SKILL.md`.
 
 ## Pull request previews
 

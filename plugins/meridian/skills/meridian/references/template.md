@@ -25,6 +25,6 @@ The template still holds placeholders. Before changing code, ask the developer t
 
 ## Keep the template's shape
 
-- Prisma stays on MySQL unless the app's database is PostgreSQL. Do not switch it because an example online uses another engine: MySQL is the default engine and the one developer databases use, and SQLite loses sessions on every deploy.
+- Prisma stays on MySQL unless the app's database is PostgreSQL. Do not switch it because an example online uses another engine: MySQL is the default engine, developer databases use the app's engine (MySQL or PostgreSQL), and SQLite loses sessions on every deploy.
 - New Meridian code goes in `app/meridian/`, and lines added to Shopify's files carry a "Meridian" comment, so the developer can still remove Meridian or pull Shopify's template updates.
 - Configuration stays in environment variables. Do not hardcode a URL, an id or a key.
