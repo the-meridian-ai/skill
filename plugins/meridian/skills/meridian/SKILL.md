@@ -38,7 +38,7 @@ A new app usually goes through all four references in that order: setup, SDK, lo
 - Approving production access: the user approves it in their browser, after confirming it's them. You may start the request and hand it over (see "Production changes from the CLI" below), but never approve anything yourself.
 - Approving the MCP connection (the OAuth consent screen in their browser).
 - Creating or rotating the production `MERIDIAN_API_KEY` (Settings, SDK in the dashboard) and putting it in the hosting secrets. For local development `meridian dev` provides `MERIDIAN_APP_ID`, a dev SDK key and `MERIDIAN_API_URL` itself, so do not ask the user to paste a key into `.env`. Never ask them to paste a key, a password or a secret into the chat.
-- Typing a secret's value (see "Variables and secrets" below), installing the Meridian GitHub app, adding a custom domain, choosing a plan.
+- Typing a secret's value (see "Variables and secrets" below), installing the Meridian GitHub app, adding a custom domain or a database, choosing the auto-deploy branch and target, choosing a plan.
 
 **Confirm in chat before you do these**, naming exactly what will happen:
 
@@ -46,6 +46,15 @@ A new app usually goes through all four references in that order: setup, SDK, lo
 - `meridian db reset`, `dev_database_reset`, or anything else that drops data.
 - `automation_update` on an automation that is already active, or `custom_field_values_set` on a real store.
 - Setting a secret, changing any variable on production or for all environments, or deleting any variable. Name the key, the scope and the environment.
+- Changing a setting of the production environment with `environment_update` (release command, health check path, port, compute). Name the setting and its new value. The tool needs `confirm: true`: pass it only after the user's yes, never on your own.
+- `sdk_credentials_set`: the Shopify client ID and secret reach every environment, production included. It needs `confirm: true` too.
+- `environment_create`: it uses the plan's environment allowance, and a new development environment changes where pushes to the auto-deploy branch land.
+
+**Hosting settings** (`references/hosting.md` has the detail):
+
+- Development and staging: change a setting yourself with `environment_update`, then tell the user what you set. Nothing in production changes.
+- Production: nothing without the user's yes in chat, as listed above. There is no production setting you may change without asking.
+- The Shopify client ID is public: after the user's yes, set it with `sdk_credentials_set`. The client secret is a secret: ask the user to type it in the dashboard (App settings, Meridian SDK). Use `sdk_credentials_set` for it only when the value is already in the project's untracked local environment and you can pass it without printing it.
 
 **Production changes from the CLI** (any `meridian` command that writes to production). The CLI token is enough for development and staging. A production change also asks a confirmation question before it is sent, and may need production access, which the user approves in their browser for a limited time (`meridian deploy` to production needs it). Go in this order:
 

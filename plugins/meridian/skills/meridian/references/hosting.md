@@ -21,11 +21,21 @@ You cannot do these. List the missing ones for the user:
 
 - Connect the repository: Settings, Integrations, GitHub card. It installs the Meridian GitHub app.
 - Add the database: Hosting, Database (MySQL or PostgreSQL, one engine per app, up to five minutes to provision). A plan that includes a database creates a MySQL one with the app; to use PostgreSQL, the user deletes it before storing data and adds a PostgreSQL one.
-- Set the environment's release command, health check path and container port.
 - Type the value of a secret: on the Environment page (write-only secrets, scoped to all environments or one), or for development and staging with `meridian env set KEY --env development` in their own terminal, which asks for it at a masked prompt. Plain variables on development and staging you set yourself with `meridian env set`, and anything on production or for all environments goes through MCP `secrets_set` / `secrets_unset` once the user agrees ("Variables and secrets" in `SKILL.md`). Meridian injects `SHOPIFY_API_KEY`, `SHOPIFY_API_SECRET`, `MERIDIAN_APP_ID`, `MERIDIAN_API_URL`, `MERIDIAN_API_KEY`, `MERIDIAN_WEBHOOK_SECRET`, `DB_*` and the add-on variables itself.
-- Choose the auto-deploy branch and target.
+- Add a custom domain: Hosting, Domains. `environments_list` returns its DNS records once it is added.
+- Choose the auto-deploy branch and target. You can read them: `environments_list` returns the branch and the environment a push really deploys to (a development target lands on production when the app has no development environment). Check it before you merge or push to that branch, and tell the user when a merge would deploy to production.
 
-Variables, secrets, the release command and the health check path reach the app with the next deploy. `environments_list` shows `config_pending_deploy: true` until then.
+## What you can set yourself
+
+`environments_list` returns the current values, so read before you change anything.
+
+- **Add a development or staging environment**: `environment_create` with the `type`, once the user agrees. The plan decides how many an app may have (Staging is Enterprise only). The production environment already exists. After adding a development environment, call `environments_list` again and read where a push lands: pushes that deployed to production because there was no development environment now deploy to the new one.
+- **Release command, health check path, container port, compute**: `environment_update` with the `environment_id` and only the settings to change. On development and staging, do it and tell the user. On production, ask first and pass `confirm: true` only after their yes.
+- **Shopify client ID and secret**: `sdk_credentials_set` with `confirm: true`, after the user's yes. Set the client ID yourself. Ask the user to type the client secret in the dashboard (App settings, Meridian SDK) unless it is already in the project's untracked local environment and you can pass it without printing it.
+
+The port and the compute settings are applied to the running service on save, with no deploy: a wrong port takes the running app down, so check the port the server listens on first. Compute values above the plan are lowered to it, and the answer returns what was saved.
+
+Variables, secrets, the Shopify credentials, the release command and the health check path reach the app with the next deploy. `environments_list` shows `config_pending_deploy: true` until then on an environment that is already deployed.
 
 ## Deploy and follow it
 

@@ -55,7 +55,7 @@ meridian link --org <org-slug> --app <app-slug>
 
 This writes `.meridian/project.json` (commit it, it holds no secret) and `.meridian/.gitignore`. With one organization or one app the CLI picks it. Add `--force` to relink a linked project.
 
-No app yet: the user creates it in the dashboard (Create app). It needs the Shopify app's client ID and secret.
+No app yet: the user creates it in the dashboard (Create app). It needs the Shopify app's client ID and secret. To replace them later, see `sdk_credentials_set` in `references/hosting.md`.
 
 ## 5. Install this skill in the project
 
