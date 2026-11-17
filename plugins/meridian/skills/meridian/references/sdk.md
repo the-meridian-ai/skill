@@ -53,7 +53,7 @@ if (!isEnabled("advanced_reports")) return <UpgradePrompt />
 await track({ eventKey: "api_calls", quantity: 1, idempotencyKey: requestId })
 ```
 
-Server side: `meridian.track({ shop, eventKey, quantity, idempotencyKey })`, or `meridian.trackMany({ shop, events })` for up to 50 events in one request. `meridian.gatesForShop(shop)` returns the gates for a loader or a job.
+Server side: `meridian.track({ shop, eventKey, quantity, idempotencyKey })`, or `meridian.trackMany({ shop, events })` for up to 50 events in one request. `meridian.gatesForShop(shop)` returns the gates for a loader or a job. In SDK 3.5.0 and later it keeps each shop's entitlements in memory for 30 seconds, because every read is a metered SDK request: `entitlementsCacheTtlMs: 0` on `createMeridianApp` turns that off, and `gatesForShop(shop, { fresh: true })` reads past it (the billing return route). A plan change made in the browser shows on the server within those 30 seconds. See `sdk-app.mdx`.
 
 ## Pitfalls
 
@@ -61,7 +61,7 @@ Server side: `meridian.track({ shop, eventKey, quantity, idempotencyKey })`, or 
 - **Billing needs Meridian hosting.** `subscribe`, `cancelSubscription` and `updateUsageCap` work only when the app runs on Meridian with a managed database, or locally under `meridian dev`. Otherwise they fail with `403 PLAN_BUILDER_UNAVAILABLE` and `err.details.plan_builder_billing_status` names the cause. Two things fail quietly instead: usage overage is never charged and prices fall back to USD. See `sdk-hosting.mdx`.
 - **SQLite breaks billing** with `session_table_missing`. Prisma must use the app's database engine, MySQL or PostgreSQL (`references/hosting.md`).
 - **`returnUrl`** must be the `https` shop-admin URL of the pricing route itself. One built from `request.url`, `window.location` or the app's own origin is rejected (`INVALID_RETURN_URL`).
-- **Gates fail open.** While `loading` is true, or after an error, everything reads as enabled. Check `loading` first, or paying merchants see an upgrade prompt flash. An unknown key reads `false` with no error.
+- **Gates fail closed.** While the provider is loading, after a failed first load, when Meridian is unreachable or rate-limits the app, and without credentials, every feature reads as off. In SDK 3.5.0 and later, read `status` before showing an upgrade prompt: `"ok"` means a `false` is the plan's answer (a shop with no plan is `"ok"` too), `"loading"`, `"failed"`, `"rate_limited"` or `"unconfigured"` mean Meridian has not answered. `failOpen: true` on `createMeridianApp` or `MeridianProvider`, or per call (`can(key, { failOpen })`, `isEnabled(key, { failOpen })`), turns features on when Meridian failed or rate-limited the app, never without credentials and never while loading. Recommend it for paid capabilities, and keep features that cost money per use closed. An unknown key reads `false` with no error. See `features.mdx`.
 - **Keys, not ids.** `track` and `updateUsageCap` take the event key. A UUID is refused with 422.
 - **Idempotency.** Pass `idempotencyKey` on every `track`: retries on 429 and 5xx only happen with one. A backdated `timestamp` requires one.
 - **Rate limits.** Reads and tracking share 120 requests a minute per shop token, billing writes 30. Batch with `trackMany`, never `Promise.all` over `track`.

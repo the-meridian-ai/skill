@@ -6,14 +6,14 @@
   },
   "metadata": {
     "description": "The Meridian plugin: build, bill and deploy Shopify apps on Meridian.",
-    "version": "1.10.0"
+    "version": "1.11.0"
   },
   "plugins": [
     {
       "name": "meridian",
       "source": "./plugins/meridian",
       "description": "Connects the Meridian MCP server and teaches the agent to use the Meridian CLI, add the SDK to a Shopify app and deploy it on Meridian hosting.",
-      "version": "1.10.0",
+      "version": "1.11.0",
       "author": {
         "name": "The Meridian",
         "email": "support@the-meridian.ai"
